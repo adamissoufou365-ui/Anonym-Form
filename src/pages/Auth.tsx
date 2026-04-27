@@ -39,22 +39,6 @@ const Auth = () => {
     } finally { setBusy(false); }
   };
 
-  const handleGoogle = async () => {
-    setBusy(true);
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-        },
-      });
-      if (error) throw error;
-    } catch (err: any) {
-      toast.error(err.message || "Connexion Google échouée");
-      setBusy(false);
-    }
-  };
-
   return (
     <div className="min-h-screen bg-background grain flex flex-col">
       <header className="border-b border-border">
@@ -74,19 +58,8 @@ const Auth = () => {
             {mode === "signin" ? "Connexion" : "Créer un compte"}
           </h1>
           <p className="text-muted-foreground mb-8">
-            Un compte pour gérer <em>vos</em> formulaires. Les répondants restent 100% anonymes.
+            Un compte pour gérer <em>vos</em> formulaires. <br/>Les répondants restent 100% anonymes.
           </p>
-
-          <Button type="button" variant="outline" className="w-full mb-4" onClick={handleGoogle} disabled={busy}>
-            <svg className="h-4 w-4" viewBox="0 0 24 24"><path fill="currentColor" d="M21.35 11.1h-9.17v2.97h5.27c-.23 1.45-1.7 4.25-5.27 4.25-3.17 0-5.76-2.62-5.76-5.85s2.59-5.85 5.76-5.85c1.81 0 3.02.77 3.71 1.43l2.53-2.44C16.95 3.93 14.78 3 12.18 3 6.97 3 2.75 7.22 2.75 12.42S6.97 21.85 12.18 21.85c7.03 0 9.34-4.93 9.34-7.45 0-.5-.05-.88-.17-1.3z"/></svg>
-            Continuer avec Google
-          </Button>
-
-          <div className="flex items-center gap-3 my-6">
-            <div className="h-px flex-1 bg-border" />
-            <span className="font-mono text-xs uppercase text-muted-foreground">ou</span>
-            <div className="h-px flex-1 bg-border" />
-          </div>
 
           <form onSubmit={handleEmail} className="space-y-4 text-center">
             <div>
