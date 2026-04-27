@@ -23,12 +23,31 @@ const Auth = () => {
     setBusy(true);
     try {
       if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email, password,
           options: { emailRedirectTo: `${window.location.origin}/` },
         });
         if (error) throw error;
-        toast.success("Compte créé. Vous êtes connecté.");
+
+        // Email confirmation enabled:
+        // - Supabase creates the user but usually returns no session until the email is confirmed.
+        // Duplicate signup:
+        // - identities can be empty while still returning a user stub (already registered).
+        const identitiesLen = data.user?.identities?.length ?? 0;
+        if (identitiesLen === 0) {
+          toast.message("Ce compte existe déjà", {
+            description: "Essaye la connexion avec cet email.",
+          });
+          setMode("signin");
+          return;
+        }
+
+        if (!data.session) {
+          toast.success("Compte créé. Confirme ton email pour activer la connexion.");
+          return;
+        }
+
+        toast.success("Compte créé. Tu es connecté.");
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
