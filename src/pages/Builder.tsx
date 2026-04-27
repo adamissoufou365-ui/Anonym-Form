@@ -85,23 +85,23 @@ const Builder = () => {
   return (
     <div className="min-h-screen bg-background grain">
       <header className="border-b border-border sticky top-0 bg-background/90 backdrop-blur z-10">
-        <div className="container flex items-center justify-between py-4">
+        <div className="container flex flex-col items-center justify-center gap-3 py-4 text-center md:flex-row md:justify-between md:text-left">
           <Button asChild variant="ghost" size="sm">
             <Link to="/"><ArrowLeft className="h-4 w-4" /> Retour</Link>
           </Button>
           <div className="font-mono text-xs text-muted-foreground">{form.id ? `FORM #${form.id.slice(0, 8)}` : "NOUVEAU"}</div>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={copyShareLink} disabled={saving}>
+          <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+            <Button variant="outline" size="sm" onClick={copyShareLink} disabled={saving} className="w-full sm:w-auto">
               <Copy className="h-4 w-4" /> Lien
             </Button>
-            <Button size="sm" onClick={handleSave} disabled={saving}>
+            <Button size="sm" onClick={handleSave} disabled={saving} className="w-full sm:w-auto">
               <Save className="h-4 w-4" /> Enregistrer
             </Button>
           </div>
         </div>
       </header>
 
-      <div className="container max-w-3xl py-12">
+      <div className="container max-w-3xl py-8 sm:py-12 text-center">
         <div className="font-mono text-xs uppercase tracking-widest text-primary mb-3">// Constructeur</div>
         <h1 className="font-display text-4xl md:text-5xl font-bold tracking-tighter mb-10">
           {id ? "Modifier" : "Nouveau"} formulaire
@@ -134,26 +134,26 @@ const Builder = () => {
 
         <div className="space-y-4">
           {form.questions.map((q, idx) => (
-            <div key={q.id} className="group border-2 border-border bg-card p-5 hover:border-primary/40 transition-colors">
-              <div className="flex items-start gap-3">
-                <div className="flex flex-col items-center gap-1 pt-2">
+            <div key={q.id} className="group border-2 border-border bg-card p-4 sm:p-5 hover:border-primary/40 transition-colors text-center">
+              <div className="flex flex-col sm:flex-row items-start gap-3">
+                <div className="flex flex-col items-center gap-1 pt-2 mx-auto sm:mx-0">
                   <GripVertical className="h-4 w-4 text-muted-foreground" />
                   <span className="font-mono text-xs text-muted-foreground">{String(idx + 1).padStart(2, "0")}</span>
                 </div>
-                <div className="flex-1 space-y-3">
-                  <div className="flex gap-3">
+                <div className="flex-1 w-full space-y-3">
+                  <div className="flex flex-col md:flex-row gap-3 items-center">
                     <Input
                       value={q.label}
                       onChange={(e) => updateQ(q.id, { label: e.target.value })}
                       placeholder="Votre question…"
-                      className="flex-1 font-medium border-0 border-b-2 rounded-none px-0 focus-visible:ring-0 focus-visible:border-primary text-base"
+                      className="w-full flex-1 font-medium border-0 border-b-2 rounded-none px-0 focus-visible:ring-0 focus-visible:border-primary text-base"
                       maxLength={200}
                     />
                     <Select value={q.type} onValueChange={(v) => updateQ(q.id, {
                       type: v as QuestionType,
                       options: (v === "single" || v === "multiple") ? (q.options ?? ["Option 1", "Option 2"]) : undefined,
                     })}>
-                      <SelectTrigger className="w-[180px]"><SelectValue /></SelectTrigger>
+                      <SelectTrigger className="w-full md:w-[180px]"><SelectValue /></SelectTrigger>
                       <SelectContent>
                         {TYPES.map(t => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}
                       </SelectContent>
@@ -161,7 +161,7 @@ const Builder = () => {
                   </div>
 
                   {(q.type === "single" || q.type === "multiple") && (
-                    <div className="space-y-2 pl-4 border-l-2 border-border">
+                    <div className="space-y-2 pl-4 border-l-2 border-border text-left">
                       {q.options?.map((opt, i) => (
                         <div key={i} className="flex gap-2">
                           <Input
@@ -187,7 +187,7 @@ const Builder = () => {
                     </div>
                   )}
 
-                  <div className="flex items-center justify-between pt-2 border-t border-border">
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2 border-t border-border">
                     <div className="flex items-center gap-2">
                       <Switch id={`req-${q.id}`} checked={q.required} onCheckedChange={(v) => updateQ(q.id, { required: v })} />
                       <Label htmlFor={`req-${q.id}`} className="font-mono text-xs uppercase tracking-wider cursor-pointer">Obligatoire</Label>
@@ -202,9 +202,9 @@ const Builder = () => {
           ))}
         </div>
 
-        <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-2">
+        <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2">
           {TYPES.map(t => (
-            <Button key={t.value} variant="outline" onClick={() => addQuestion(t.value)} className="justify-start">
+            <Button key={t.value} variant="outline" onClick={() => addQuestion(t.value)} className="justify-center sm:justify-start">
               <Plus className="h-4 w-4" /> {t.label}
             </Button>
           ))}

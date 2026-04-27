@@ -55,17 +55,17 @@ const FormResponses = () => {
   return (
     <div className="min-h-screen bg-background grain">
       <header className="border-b border-border">
-        <div className="container flex items-center justify-between py-4">
+        <div className="container flex flex-col items-center justify-center gap-3 py-4 text-center sm:flex-row sm:justify-between">
           <Button asChild variant="ghost" size="sm">
             <Link to="/"><ArrowLeft className="h-4 w-4" /> Retour</Link>
           </Button>
-          <Button size="sm" variant="outline" onClick={exportCSV} disabled={responses.length === 0}>
+          <Button size="sm" variant="outline" onClick={exportCSV} disabled={responses.length === 0} className="w-full sm:w-auto">
             <Download className="h-4 w-4" /> Exporter CSV
           </Button>
         </div>
       </header>
 
-      <div className="container max-w-5xl py-12">
+      <div className="container max-w-5xl py-10 sm:py-12 text-center">
         <div className="font-mono text-xs uppercase tracking-widest text-primary mb-3">// Réponses</div>
         <h1 className="font-display text-4xl md:text-5xl font-bold tracking-tighter mb-2">{form.title}</h1>
         <p className="text-muted-foreground mb-10">
@@ -83,12 +83,12 @@ const FormResponses = () => {
         ) : (
           <div className="space-y-px bg-border border border-border">
             {responses.map((r, i) => (
-              <div key={r.id} className="bg-card p-6">
-                <div className="flex items-center justify-between mb-4 pb-3 border-b border-border">
+              <div key={r.id} className="bg-card p-4 sm:p-6 text-center">
+                <div className="flex flex-col items-center justify-center gap-1 mb-4 pb-3 border-b border-border">
                   <div className="font-display text-xl font-bold">Réponse #{String(i + 1).padStart(3, "0")}</div>
                   <div className="font-mono text-xs text-muted-foreground">{formatDate(r.submittedAt)}</div>
                 </div>
-                <dl className="grid gap-4 md:grid-cols-2">
+                <dl className="grid gap-4 md:grid-cols-2 text-left">
                   {form.questions.map(q => {
                     const v = r.answers[q.id];
                     const display = Array.isArray(v) ? v.join(", ") : (v as string) || "—";

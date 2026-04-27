@@ -58,7 +58,7 @@ const Auth = () => {
   return (
     <div className="min-h-screen bg-background grain flex flex-col">
       <header className="border-b border-border">
-        <div className="container py-4">
+        <div className="container py-4 flex justify-center">
           <Button asChild variant="ghost" size="sm">
             <Link to="/"><ArrowLeft className="h-4 w-4" /> Retour</Link>
           </Button>
@@ -66,7 +66,7 @@ const Auth = () => {
       </header>
 
       <main className="flex-1 flex items-center justify-center px-6 py-16">
-        <div className="w-full max-w-md">
+        <div className="w-full max-w-md text-center">
           <div className="inline-flex items-center gap-2 border border-primary/30 bg-primary/5 px-3 py-1.5 mb-6 font-mono text-xs uppercase tracking-widest text-primary">
             <ShieldCheck className="h-3.5 w-3.5" /> Espace créateur
           </div>
@@ -88,7 +88,7 @@ const Auth = () => {
             <div className="h-px flex-1 bg-border" />
           </div>
 
-          <form onSubmit={handleEmail} className="space-y-4">
+          <form onSubmit={handleEmail} className="space-y-4 text-center">
             <div>
               <Label htmlFor="email" className="font-mono text-xs uppercase tracking-wider">Email</Label>
               <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="mt-2 border-2" />

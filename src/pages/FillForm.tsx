@@ -78,12 +78,12 @@ const FillForm = () => {
 
   return (
     <div className="min-h-screen bg-background grain">
-      <div className="container max-w-2xl py-12 md:py-20">
+      <div className="container max-w-2xl py-10 md:py-20 text-center">
         <div className="inline-flex items-center gap-2 border border-primary/30 bg-primary/5 px-3 py-1.5 mb-8 font-mono text-xs uppercase tracking-widest text-primary">
           <ShieldCheck className="h-3.5 w-3.5" /> Réponse 100% anonyme
         </div>
 
-        <h1 className="font-display text-4xl md:text-5xl font-bold tracking-tighter text-balance mb-4">
+        <h1 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold tracking-tighter text-balance mb-4">
           {form.title}
         </h1>
         {form.description && (
@@ -92,7 +92,7 @@ const FillForm = () => {
 
         <form onSubmit={handleSubmit} className="space-y-8">
           {form.questions.map((q, idx) => (
-            <div key={q.id} className="border-l-2 border-border pl-6 hover:border-primary transition-colors">
+            <div key={q.id} className="border-l-2 border-border pl-4 sm:pl-6 hover:border-primary transition-colors text-left">
               <div className="flex items-baseline gap-3 mb-3">
                 <span className="font-mono text-xs text-primary">{String(idx + 1).padStart(2, "0")}</span>
                 <Label className="text-base font-medium leading-snug">
@@ -151,7 +151,7 @@ const FillForm = () => {
             </div>
           ))}
 
-          <div className="pt-4">
+          <div className="pt-4 flex justify-center">
             <Button type="submit" size="lg" className="w-full md:w-auto" disabled={busy}>Envoyer ma réponse</Button>
           </div>
         </form>
