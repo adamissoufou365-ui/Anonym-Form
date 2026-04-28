@@ -57,6 +57,8 @@ export async function buildResponsesWorkbook(form: FormDef, responses: FormRespo
   wb.created = new Date();
 
   const title = form.title?.trim() || "Formulaire";
+  const oldestFirst = [...responses].sort((a, b) => a.submittedAt - b.submittedAt);
+  const orderByResponseId = new Map(oldestFirst.map((r, idx) => [r.id, idx + 1]));
 
   // --- Vue densemble (premiere feuille)
   const overview = wb.addWorksheet(sanitizeSheetName("Vue densemble"), {
@@ -82,8 +84,9 @@ export async function buildResponsesWorkbook(form: FormDef, responses: FormRespo
   oHeader.eachCell((cell) => Object.assign(cell, headerStyle));
 
   responses.forEach((r, i) => {
+    const orderNum = orderByResponseId.get(r.id) ?? i + 1;
     overview.addRow([
-      String(i + 1).padStart(3, "0"),
+      String(orderNum).padStart(3, "0"),
       formatDisplayDate(r.submittedAt),
       formatIsoDate(r.submittedAt),
       r.id,
@@ -94,7 +97,8 @@ export async function buildResponsesWorkbook(form: FormDef, responses: FormRespo
   const usedNames = new Set<string>([overview.name]);
 
   responses.forEach((r, i) => {
-    const num = String(i + 1).padStart(3, "0");
+    const orderNum = orderByResponseId.get(r.id) ?? i + 1;
+    const num = String(orderNum).padStart(3, "0");
     let baseName = sanitizeSheetName(`Rep ${num}`);
     if (!baseName) baseName = "Rep";
 

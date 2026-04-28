@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Download, Inbox } from "lucide-react";
@@ -16,9 +16,19 @@ const FormResponses = () => {
   useEffect(() => {
     if (!id) return;
     Promise.all([getForm(id), listResponses(id)])
-      .then(([f, r]) => { setForm(f); setResponses(r); })
+      .then(([f, r]) => {
+        const sorted = [...r].sort((a, b) => b.submittedAt - a.submittedAt);
+        setForm(f);
+        setResponses(sorted);
+      })
       .catch(e => toast.error(e.message));
   }, [id]);
+
+  // Ordre métier: les plus anciens ont les plus petits numéros.
+  const rankById = useMemo(() => {
+    const asc = [...responses].sort((a, b) => a.submittedAt - b.submittedAt);
+    return new Map(asc.map((r, idx) => [r.id, idx + 1]));
+  }, [responses]);
 
   const exportExcel = async () => {
     if (!form || responses.length === 0) return;
@@ -92,7 +102,7 @@ const FormResponses = () => {
             {responses.map((r, i) => (
               <div key={r.id} className="bg-card p-4 sm:p-6 text-center">
                 <div className="flex flex-col items-center justify-center gap-1 mb-4 pb-3 border-b border-border">
-                  <div className="font-display text-xl font-bold">Réponse #{String(i + 1).padStart(3, "0")}</div>
+                  <div className="font-display text-xl font-bold">Réponse #{String(rankById.get(r.id) ?? i + 1).padStart(3, "0")}</div>
                   <div className="font-mono text-xs text-muted-foreground">{formatDate(r.submittedAt)}</div>
                 </div>
                 <ol className="mx-auto max-w-3xl space-y-4 text-left">
