@@ -1,8 +1,19 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Download, Inbox } from "lucide-react";
-import { getForm, listResponses, type FormDef, type FormResponse, publicFormPath } from "@/lib/forms-store";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { ArrowLeft, Download, Inbox, Trash2 } from "lucide-react";
+import { deleteResponse, getForm, listResponses, type FormDef, type FormResponse, publicFormPath } from "@/lib/forms-store";
 import { downloadResponsesXlsx } from "@/lib/export-responses-xlsx";
 import { toast } from "sonner";
 
@@ -12,6 +23,7 @@ const FormResponses = () => {
   const { id } = useParams();
   const [form, setForm] = useState<FormDef | null>(null);
   const [responses, setResponses] = useState<FormResponse[]>([]);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!id) return;
@@ -37,6 +49,19 @@ const FormResponses = () => {
       toast.success("Export Excel telecharge");
     } catch (e: any) {
       toast.error(e.message || "Export impossible");
+    }
+  };
+
+  const handleDeleteResponse = async (responseId: string) => {
+    setDeletingId(responseId);
+    try {
+      await deleteResponse(responseId);
+      setResponses((prev) => prev.filter((r) => r.id !== responseId));
+      toast.success("Réponse supprimée");
+    } catch (e: any) {
+      toast.error(e.message || "Suppression impossible");
+    } finally {
+      setDeletingId(null);
     }
   };
 

@@ -129,6 +129,11 @@ export async function listResponses(formId: string): Promise<FormResponse[]> {
   return (data ?? []).map(rowToResp);
 }
 
+export async function deleteResponse(responseId: string): Promise<void> {
+  const { error } = await supabase.from("responses").delete().eq("id", responseId);
+  if (error) throw error;
+}
+
 export async function countResponses(formId: string): Promise<number> {
   const { count, error } = await supabase.from("responses").select("*", { count: "exact", head: true }).eq("form_id", formId);
   if (error) throw error;
