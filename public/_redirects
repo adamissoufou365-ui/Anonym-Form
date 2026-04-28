@@ -1,0 +1,2 @@
+# SPA fallback : toutes les routes client (ex. /f/:id, /builder/...) renvoient index.html
+/*    /index.html   200
