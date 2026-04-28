@@ -1,8 +1,19 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { listMyForms, deleteForm, countResponses, type FormDef, publicFormPath } from "@/lib/forms-store";
-import { ArrowUpRight, Plus, Trash2, BarChart3, Eye, LogOut, LogIn } from "lucide-react";
+import { ArrowUpRight, Plus, Trash2, MessageSquareText, Link2, LogOut, LogIn } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -142,14 +153,32 @@ const Index = () => {
                         <Link to={`/builder/${f.id}`}>Éditer</Link>
                       </Button>
                       <Button size="sm" variant="ghost" onClick={() => copyLink(f)} title="Copier le lien">
-                        <Eye className="h-4 w-4" />
+                        <Link2 className="h-4 w-4" />
                       </Button>
                       <Button asChild size="sm" variant="ghost" title="Réponses">
-                        <Link to={`/responses/${f.id}`}><BarChart3 className="h-4 w-4" /></Link>
+                        <Link to={`/responses/${f.id}`}><MessageSquareText className="h-4 w-4" /></Link>
                       </Button>
-                      <Button size="sm" variant="ghost" onClick={() => handleDelete(f.id)} title="Supprimer">
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button size="sm" variant="ghost" title="Supprimer">
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Supprimer ce formulaire ?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Cette action est irréversible. Le formulaire et ses réponses seront supprimés définitivement.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Annuler</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => handleDelete(f.id)}>
+                              Oui, supprimer
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </div>
                   </article>
                 );
