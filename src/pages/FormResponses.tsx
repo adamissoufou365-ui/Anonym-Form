@@ -41,6 +41,23 @@ const FormResponses = () => {
     URL.revokeObjectURL(url);
   };
 
+  const renderAnswerBody = (raw: unknown) => {
+    const v = raw as string | string[] | undefined;
+    if (Array.isArray(v)) {
+      if (v.length === 0) return <span className="text-muted-foreground">—</span>;
+      return (
+        <ul className="list-disc pl-5 space-y-1">
+          {v.map((item, idx) => (
+            <li key={idx} className="break-words">{item}</li>
+          ))}
+        </ul>
+      );
+    }
+    const s = (v as string) || "";
+    if (!s.trim()) return <span className="text-muted-foreground">—</span>;
+    return <span className="break-words whitespace-pre-wrap">{s}</span>;
+  };
+
   if (!form) {
     return (
       <div className="min-h-screen bg-background grain flex items-center justify-center">
@@ -89,18 +106,16 @@ const FormResponses = () => {
                   <div className="font-display text-xl font-bold">Réponse #{String(i + 1).padStart(3, "0")}</div>
                   <div className="font-mono text-xs text-muted-foreground">{formatDate(r.submittedAt)}</div>
                 </div>
-                <dl className="grid gap-4 md:grid-cols-2 text-left">
-                  {form.questions.map(q => {
-                    const v = r.answers[q.id];
-                    const display = Array.isArray(v) ? v.join(", ") : (v as string) || "—";
-                    return (
-                      <div key={q.id}>
-                        <dt className="font-mono text-xs uppercase tracking-wider text-muted-foreground mb-1">{q.label || q.id}</dt>
-                        <dd className="text-foreground whitespace-pre-wrap break-words">{display}</dd>
+                <ol className="mx-auto max-w-3xl space-y-4 text-left">
+                  {form.questions.map((q, qi) => (
+                    <li key={q.id} className="border-l-2 border-primary/40 pl-4">
+                      <div className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground mb-1">
+                        {String(qi + 1).padStart(2, "0")} · {q.label || q.id}
                       </div>
-                    );
-                  })}
-                </dl>
+                      <div className="text-foreground">{renderAnswerBody(r.answers[q.id])}</div>
+                    </li>
+                  ))}
+                </ol>
               </div>
             ))}
           </div>
