@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { isUuid, slugifyTitle } from "@/lib/slug";
 
 export type QuestionType = "short" | "long" | "single" | "multiple";
 
@@ -12,6 +13,7 @@ export interface Question {
 
 export interface FormDef {
   id: string;
+  slug: string;
   title: string;
   description: string;
   questions: Question[];
@@ -29,6 +31,7 @@ export const uid = () => Math.random().toString(36).slice(2, 10);
 
 const rowToForm = (r: any): FormDef => ({
   id: r.id,
+  slug: r.slug ?? "",
   title: r.title ?? "",
   description: r.description ?? "",
   questions: (r.questions ?? []) as Question[],
@@ -48,17 +51,40 @@ export async function listMyForms(): Promise<FormDef[]> {
   return (data ?? []).map(rowToForm);
 }
 
-export async function getForm(id: string): Promise<FormDef | null> {
-  const { data, error } = await supabase.from("forms").select("*").eq("id", id).maybeSingle();
+export async function getForm(idOrSlug: string): Promise<FormDef | null> {
+  const key = idOrSlug.trim();
+  if (!key) return null;
+
+  if (isUuid(key)) {
+    const { data, error } = await supabase.from("forms").select("*").eq("id", key).maybeSingle();
+    if (error) throw error;
+    return data ? rowToForm(data) : null;
+  }
+
+  const { data, error } = await supabase.from("forms").select("*").eq("slug", key).maybeSingle();
   if (error) throw error;
   return data ? rowToForm(data) : null;
 }
 
-export async function createForm(form: Omit<FormDef, "id" | "createdAt">): Promise<FormDef> {
+async function pickUniqueSlug(base: string, excludeId?: string): Promise<string> {
+  const cleanBase = slugifyTitle(base);
+  for (let i = 0; i < 50; i++) {
+    const candidate = i === 0 ? cleanBase : `${cleanBase}-${i + 1}`;
+    const { data, error } = await supabase.from("forms").select("id").eq("slug", candidate).maybeSingle();
+    if (error) throw error;
+    if (!data) return candidate;
+    if (excludeId && data.id === excludeId) return candidate;
+  }
+  throw new Error("Impossible de générer un identifiant d'URL unique");
+}
+
+export async function createForm(form: Omit<FormDef, "id" | "createdAt" | "slug">): Promise<FormDef> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error("Non authentifié");
+  const slug = await pickUniqueSlug(form.title);
   const { data, error } = await supabase.from("forms").insert({
     owner_id: user.id,
+    slug,
     title: form.title,
     description: form.description,
     questions: form.questions as any,
@@ -72,9 +98,19 @@ export async function updateForm(id: string, form: Partial<Omit<FormDef, "id" | 
   if (form.title !== undefined) patch.title = form.title;
   if (form.description !== undefined) patch.description = form.description;
   if (form.questions !== undefined) patch.questions = form.questions;
+
+  if (form.title !== undefined) {
+    patch.slug = await pickUniqueSlug(form.title, id);
+  }
+
   const { data, error } = await supabase.from("forms").update(patch).eq("id", id).select().single();
   if (error) throw error;
   return rowToForm(data);
+}
+
+export function publicFormPath(form: Pick<FormDef, "slug" | "id">) {
+  const seg = form.slug?.trim() || form.id;
+  return `/f/${seg}`;
 }
 
 export async function deleteForm(id: string): Promise<void> {

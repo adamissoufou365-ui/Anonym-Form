@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { listMyForms, deleteForm, countResponses, type FormDef } from "@/lib/forms-store";
+import { listMyForms, deleteForm, countResponses, type FormDef, publicFormPath } from "@/lib/forms-store";
 import { ArrowUpRight, Plus, Trash2, BarChart3, Eye, LogOut, LogIn } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
@@ -29,8 +29,8 @@ const Index = () => {
     catch (e: any) { toast.error(e.message); }
   };
 
-  const copyLink = (id: string) => {
-    navigator.clipboard.writeText(`${window.location.origin}/f/${id}`);
+  const copyLink = (form: Pick<FormDef, "slug" | "id">) => {
+    navigator.clipboard.writeText(`${window.location.origin}${publicFormPath(form)}`);
     toast.success("Lien copié dans le presse-papiers");
   };
 
@@ -141,7 +141,7 @@ const Index = () => {
                       <Button asChild size="sm" variant="ghost" className="w-full sm:flex-1 sm:w-auto">
                         <Link to={`/builder/${f.id}`}>Éditer</Link>
                       </Button>
-                      <Button size="sm" variant="ghost" onClick={() => copyLink(f.id)} title="Copier le lien">
+                      <Button size="sm" variant="ghost" onClick={() => copyLink(f)} title="Copier le lien">
                         <Eye className="h-4 w-4" />
                       </Button>
                       <Button asChild size="sm" variant="ghost" title="Réponses">

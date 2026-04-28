@@ -21,6 +21,7 @@ export type Database = {
           id: string
           owner_id: string
           questions: Json
+          slug: string
           title: string
           updated_at: string
         }
@@ -30,6 +31,7 @@ export type Database = {
           id?: string
           owner_id: string
           questions?: Json
+          slug: string
           title?: string
           updated_at?: string
         }
@@ -39,6 +41,7 @@ export type Database = {
           id?: string
           owner_id?: string
           questions?: Json
+          slug?: string
           title?: string
           updated_at?: string
         }

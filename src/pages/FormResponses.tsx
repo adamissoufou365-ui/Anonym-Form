@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Download, Inbox } from "lucide-react";
-import { getForm, listResponses, type FormDef, type FormResponse } from "@/lib/forms-store";
+import { getForm, listResponses, type FormDef, type FormResponse, publicFormPath } from "@/lib/forms-store";
 import { toast } from "sonner";
 
 const formatDate = (ts: number) => new Date(ts).toLocaleString("fr-FR", { dateStyle: "medium", timeStyle: "short" });
@@ -77,7 +77,8 @@ const FormResponses = () => {
             <Inbox className="h-10 w-10 mx-auto text-muted-foreground mb-4" />
             <p className="text-muted-foreground mb-2">Aucune réponse pour le moment.</p>
             <p className="font-mono text-xs text-muted-foreground">
-              Partagez le lien : <span className="text-primary">{window.location.origin}/f/{form.id}</span>
+              Partagez le lien :{" "}
+              <span className="text-primary">{window.location.origin}{publicFormPath(form)}</span>
             </p>
           </div>
         ) : (

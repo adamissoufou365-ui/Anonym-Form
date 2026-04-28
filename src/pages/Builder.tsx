@@ -7,11 +7,12 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft, GripVertical, Plus, Trash2, Copy, Save } from "lucide-react";
-import { type FormDef, type Question, type QuestionType, getForm, uid, createForm, updateForm } from "@/lib/forms-store";
+import { type FormDef, type Question, type QuestionType, getForm, uid, createForm, updateForm, publicFormPath } from "@/lib/forms-store";
 import { toast } from "sonner";
 
 const emptyForm = (): FormDef => ({
   id: "",
+  slug: "",
   title: "",
   description: "",
   questions: [],
@@ -78,7 +79,7 @@ const Builder = () => {
   const copyShareLink = async () => {
     const saved = await persist();
     if (!saved) return;
-    navigator.clipboard.writeText(`${window.location.origin}/f/${saved.id}`);
+    navigator.clipboard.writeText(`${window.location.origin}${publicFormPath(saved)}`);
     toast.success("Lien copié");
   };
 
