@@ -6,6 +6,16 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { getForm, submitResponse, type FormDef } from "@/lib/forms-store";
 import { CheckCircle2, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
@@ -17,6 +27,7 @@ const FillForm = () => {
   const [answers, setAnswers] = useState<Record<string, string | string[]>>({});
   const [submitted, setSubmitted] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   useEffect(() => {
     if (!id) { setLoading(false); return; }
@@ -26,8 +37,7 @@ const FillForm = () => {
   const setAnswer = (qid: string, value: string | string[]) =>
     setAnswers(prev => ({ ...prev, [qid]: value }));
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const submitCurrentAnswers = async () => {
     if (!form) return;
     for (const q of form.questions) {
       if (q.required) {
@@ -38,6 +48,17 @@ const FillForm = () => {
         }
       }
     }
+    setConfirmOpen(true);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await submitCurrentAnswers();
+  };
+
+  const confirmSubmit = async () => {
+    if (!form) return;
+    setConfirmOpen(false);
     setBusy(true);
     try {
       await submitResponse(form.id, answers);
@@ -155,6 +176,23 @@ const FillForm = () => {
             <Button type="submit" size="lg" className="w-full md:w-auto" disabled={busy}>Envoyer ma réponse</Button>
           </div>
         </form>
+
+        <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Confirmer l&apos;envoi</AlertDialogTitle>
+              <AlertDialogDescription>
+                Voulez-vous vraiment envoyer votre réponse ? Cette action ne peut pas être annulée.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Annuler</AlertDialogCancel>
+              <AlertDialogAction onClick={() => void confirmSubmit()} disabled={busy}>
+                Confirmer l&apos;envoi
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>
   );
