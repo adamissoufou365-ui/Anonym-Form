@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Download, Inbox } from "lucide-react";
 import { getForm, listResponses, type FormDef, type FormResponse, publicFormPath } from "@/lib/forms-store";
+import { downloadResponsesXlsx } from "@/lib/export-responses-xlsx";
 import { toast } from "sonner";
 
 const formatDate = (ts: number) => new Date(ts).toLocaleString("fr-FR", { dateStyle: "medium", timeStyle: "short" });
@@ -19,26 +20,14 @@ const FormResponses = () => {
       .catch(e => toast.error(e.message));
   }, [id]);
 
-  const exportCSV = () => {
-    if (!form) return;
-    const headers = ["#", "Date", ...form.questions.map(q => q.label || q.id)];
-    const rows = responses.map((r, i) => [
-      String(i + 1),
-      formatDate(r.submittedAt),
-      ...form.questions.map(q => {
-        const v = r.answers[q.id];
-        if (Array.isArray(v)) return v.join("; ");
-        return (v as string) || "";
-      }),
-    ]);
-    const csv = [headers, ...rows].map(row =>
-      row.map(c => `"${String(c).replace(/"/g, '""')}"`).join(",")
-    ).join("\n");
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url; a.download = `${form.title || "form"}.csv`; a.click();
-    URL.revokeObjectURL(url);
+  const exportExcel = async () => {
+    if (!form || responses.length === 0) return;
+    try {
+      await downloadResponsesXlsx(form, responses);
+      toast.success("Export Excel telecharge");
+    } catch (e: any) {
+      toast.error(e.message || "Export impossible");
+    }
   };
 
   const renderAnswerBody = (raw: unknown) => {
@@ -76,8 +65,8 @@ const FormResponses = () => {
           <Button asChild variant="ghost" size="sm">
             <Link to="/"><ArrowLeft className="h-4 w-4" /> Retour</Link>
           </Button>
-          <Button size="sm" variant="outline" onClick={exportCSV} disabled={responses.length === 0} className="w-full sm:w-auto">
-            <Download className="h-4 w-4" /> Exporter CSV
+          <Button size="sm" variant="outline" onClick={() => void exportExcel()} disabled={responses.length === 0} className="w-full sm:w-auto">
+            <Download className="h-4 w-4" /> Exporter Excel
           </Button>
         </div>
       </header>
